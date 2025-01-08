@@ -1,5 +1,5 @@
 import { CHATS, COMPANY_PROFILES, SEEKER_PROFILES } from '../index.js';
-import { readJSON, writeJSON, getProfileById } from '../methods';
+import { readJSON, writeJSON, getProfileById } from '../methods.js';
 
 export const createChat = async (req, res) => {
   let chats = await readJSON(CHATS);

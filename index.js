@@ -42,11 +42,7 @@ export const COMPANY_PROFILES = path.join(USER_DATA_DIR, 'companyProfiles.json')
 export const CHATS = path.join(USER_DATA_DIR, 'chats.json');
 
 // Middleware
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: 'Content-Type'
-}));
+app.use(cors());
 app.use(express.json());
 app.use('/cv', express.static(CV_DIR));
 
