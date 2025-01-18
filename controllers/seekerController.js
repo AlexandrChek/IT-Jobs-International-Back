@@ -3,6 +3,7 @@ import { SEEKER_PROFILES } from '../index.js';
 import {
   readJSON,
   writeJSON,
+  checkIfEmailExist,
   getProfileById,
   getProfileIndexById,
   countTotalWorkExperience,
@@ -15,25 +16,38 @@ import {
   checkSkills,
   checkEnglish,
 } from '../methods.js';
+import { emailDoesAlreadyExistResponse } from '../constants.js';
 
 export const signUpSeeker = async (req, res) => {
-  let profiles = await readJSON(SEEKER_PROFILES);
+  const emailDoesntExist = await checkIfEmailExist(req.body.email);
 
-  profiles.profiles.push({ seekerId: nanoid(7), regData: req.body });
-  await writeJSON(SEEKER_PROFILES, profiles);
+  if (emailDoesntExist) {
+    let profiles = await readJSON(SEEKER_PROFILES);
 
-  res.sendStatus(200);
+    profiles.profiles.push({ seekerId: nanoid(7), regData: req.body });
+    await writeJSON(SEEKER_PROFILES, profiles);
+
+    res.sendStatus(200);
+  } else {
+    res.status(200).json(emailDoesAlreadyExistResponse);
+  }
 };
 //-----------------------------------------------------------------------------------------
 export const editSeekerRegData = async (req, res) => {
   const { seekerid } = req.params;
-  let profiles = await readJSON(SEEKER_PROFILES);
-  const profileIndex = getProfileIndexById(profiles, 'seeker', seekerid);
+  const emailDoesntExist = await checkIfEmailExist(req.body.email, 'seeker', seekerid);
 
-  profiles.profiles[profileIndex].regData = { ...req.body };
-  await writeJSON(SEEKER_PROFILES, profiles);
+  if (emailDoesntExist) {
+    let profiles = await readJSON(SEEKER_PROFILES);
+    const profileIndex = getProfileIndexById(profiles, 'seeker', seekerid);
 
-  res.sendStatus(200);
+    profiles.profiles[profileIndex].regData = { ...req.body };
+    await writeJSON(SEEKER_PROFILES, profiles);
+
+    res.sendStatus(200);
+  } else {
+    res.status(200).json(emailDoesAlreadyExistResponse);
+  }
 };
 //-----------------------------------------------------------------------------------------
 export const saveSeekerProfile = async (req, res) => {

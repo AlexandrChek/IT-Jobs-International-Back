@@ -3,29 +3,43 @@ import { COMPANY_PROFILES } from '../index.js';
 import {
   readJSON,
   writeJSON,
+  checkIfEmailExist,
   getProfileById,
   getProfileIndexById,
   removeProfileById,
 } from '../methods.js';
+import { emailDoesAlreadyExistResponse } from '../constants.js';
 
 export const signUpCompany = async (req, res) => {
-  let profiles = readJSON(COMPANY_PROFILES);
+  const emailDoesntExist = await checkIfEmailExist(req.body.email);
+  
+  if (emailDoesntExist) {
+    let profiles = await readJSON(COMPANY_PROFILES);
 
-  profiles.profiles.push({ companyId: nanoid(7), regData: req.body });
-  await writeJSON(COMPANY_PROFILES, profiles);
+    profiles.profiles.push({ companyId: nanoid(7), regData: req.body });
+    await writeJSON(COMPANY_PROFILES, profiles);
 
-  res.sendStatus(200);
+    res.sendStatus(200);
+  } else {
+    res.status(200).json(emailDoesAlreadyExistResponse);
+  }
 };
 //-----------------------------------------------------------------------------------------
 export const editCompanyRegData = async (req, res) => {
   const { companyid } = req.params;
-  let profiles = await readJSON(COMPANY_PROFILES);
-  const profileIndex = getProfileIndexById(profiles, 'company', companyid);
+  const emailDoesntExist = await checkIfEmailExist(req.body.email, 'company', companyid);
 
-  profiles.profiles[profileIndex].regData = { ...req.body };
-  await writeJSON(COMPANY_PROFILES, profiles);
+  if (emailDoesntExist) {
+    let profiles = await readJSON(COMPANY_PROFILES);
+    const profileIndex = getProfileIndexById(profiles, 'company', companyid);
 
-  res.sendStatus(200);
+    profiles.profiles[profileIndex].regData = { ...req.body };
+    await writeJSON(COMPANY_PROFILES, profiles);
+
+    res.sendStatus(200);
+  } else {
+    res.status(200).json(emailDoesAlreadyExistResponse);
+  }
 };
 //-----------------------------------------------------------------------------------------
 export const saveCompanyProfile = async (req, res) => {

@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { COMPANY_PROFILES, SEEKER_PROFILES } from './index.js';
 import { englishLevels } from './constants.js';
 
 // Fn to read JSON-files:
@@ -7,6 +8,25 @@ export const readJSON = async filePath => JSON.parse(await fs.readFile(filePath,
 // Fn to write JSON-files:
 export const writeJSON = async (filePath, data) =>
   await fs.writeFile(filePath, JSON.stringify(data));
+
+// Fn to check if the e-mail in the body exists in other profiles:
+export const checkIfEmailExist = async (email, userType = '', id = '') => {
+  let companyProfiles = await readJSON(COMPANY_PROFILES);
+  let seekerProfiles = await readJSON(SEEKER_PROFILES);
+
+  if (userType === 'company') {
+    companyProfiles = removeProfileById(companyProfiles, userType, id);
+  };
+  if (userType === 'seeker') {
+    seekerProfiles = removeProfileById(seekerProfiles, userType, id);
+  };
+
+  const checkIfEmailsMatch = profile => profile.regData.email !== email;
+  const isEmailExistsInCompanies = companyProfiles.profiles.every(checkIfEmailsMatch);
+  const isEmailExistsInSeekers = seekerProfiles.profiles.every(checkIfEmailsMatch);
+
+  return (isEmailExistsInCompanies && isEmailExistsInSeekers);
+}
 
 // Fn to find the profile by ID:
 export const getProfileById = (profiles, userType, id) => {
