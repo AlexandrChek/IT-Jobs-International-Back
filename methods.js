@@ -21,11 +21,11 @@ export const checkIfEmailExist = async (email, userType = '', id = '') => {
     seekerProfiles = removeProfileById(seekerProfiles, userType, id);
   };
 
-  const checkIfEmailsMatch = profile => profile.regData.email !== email;
-  const isEmailExistsInCompanies = companyProfiles.profiles.every(checkIfEmailsMatch);
-  const isEmailExistsInSeekers = seekerProfiles.profiles.every(checkIfEmailsMatch);
+  const checkIfEmailsMatch = profile => profile.regData.email === email;
+  const isEmailExistsInCompanies = companyProfiles.profiles.some(checkIfEmailsMatch);
+  const isEmailExistsInSeekers = seekerProfiles.profiles.some(checkIfEmailsMatch);
 
-  return (isEmailExistsInCompanies && isEmailExistsInSeekers);
+  return !(isEmailExistsInCompanies || isEmailExistsInSeekers);
 }
 
 // Fn to find the profile by ID:
