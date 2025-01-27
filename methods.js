@@ -16,17 +16,17 @@ export const checkIfEmailExist = async (email, userType = '', id = '') => {
 
   if (userType === 'company') {
     companyProfiles = removeProfileById(companyProfiles, userType, id);
-  };
+  }
   if (userType === 'seeker') {
     seekerProfiles = removeProfileById(seekerProfiles, userType, id);
-  };
+  }
 
   const checkIfEmailsMatch = profile => profile.regData.email === email;
   const isEmailExistsInCompanies = companyProfiles.profiles.some(checkIfEmailsMatch);
   const isEmailExistsInSeekers = seekerProfiles.profiles.some(checkIfEmailsMatch);
 
   return !(isEmailExistsInCompanies || isEmailExistsInSeekers);
-}
+};
 
 // Fn to find the profile by ID:
 export const getProfileById = (profiles, userType, id) => {

@@ -1,5 +1,5 @@
 export const emailDoesAlreadyExistResponse = {
-  emailDoesAlreadyExist: 'A user with this e-mail already exists.'
+  emailDoesAlreadyExist: 'A user with this e-mail already exists.',
 };
 
 export const englishLevels = [

@@ -54,7 +54,6 @@ export const saveSeekerProfile = async (req, res) => {
   const { seekerid } = req.params;
   let profiles = await readJSON(SEEKER_PROFILES);
   const profileIndex = getProfileIndexById(profiles, 'seeker', seekerid);
-  let normalizedPublicInfo = null;
 
   // Fn to convert properties of work experience or education in a seeker public info object
   // to an array of objects
@@ -82,26 +81,24 @@ export const saveSeekerProfile = async (req, res) => {
       arrayOfObjects.push(itemObj);
     }
 
-    let normalizedPublicInfo = { ...publicInfoObj };
+    let normPublicInfo = { ...publicInfoObj };
 
     necessaryKeys.forEach(key => {
-      delete normalizedPublicInfo[key];
+      delete normPublicInfo[key];
     });
 
-    normalizedPublicInfo[experienceType] = arrayOfObjects;
+    normPublicInfo[experienceType] = arrayOfObjects;
 
-    return normalizedPublicInfo;
+    return normPublicInfo;
   };
 
-  if (req.body.work_from_0 && !req.body.education_from_0) {
-    normalizedPublicInfo = normalizeExperienceBlock(req.body, 'work');
-  } else if (!req.body.work_from_0 && req.body.education_from_0) {
-    normalizedPublicInfo = normalizeExperienceBlock(req.body, 'education');
-  } else if (req.body.work_from_0 && req.body.education_from_0) {
-    normalizedPublicInfo = normalizeExperienceBlock(req.body, 'work');
+  let normalizedPublicInfo = { ...req.body };
+
+  if (req.body.work_from_0) {
+    normalizedPublicInfo = normalizeExperienceBlock(normalizedPublicInfo, 'work');
+  }
+  if (req.body.education_from_0) {
     normalizedPublicInfo = normalizeExperienceBlock(normalizedPublicInfo, 'education');
-  } else {
-    normalizedPublicInfo = { ...req.body };
   }
 
   profiles.profiles[profileIndex].publicInfo = makeWorkplacesAnArray(normalizedPublicInfo);

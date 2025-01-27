@@ -12,7 +12,7 @@ import { emailDoesAlreadyExistResponse } from '../constants.js';
 
 export const signUpCompany = async (req, res) => {
   const emailDoesntExist = await checkIfEmailExist(req.body.email);
-  
+
   if (emailDoesntExist) {
     let profiles = await readJSON(COMPANY_PROFILES);
 
