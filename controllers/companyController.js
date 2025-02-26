@@ -67,7 +67,11 @@ export const getCompanyProfile = async (req, res) => {
   const profile = getProfileById(profiles, 'company', companyid);
   const companyName = profile.regData.companyName;
   const location = `${profile.regData.country}, ${profile.regData.city}`;
-  const response = { ...profile.publicInfo, companyName, location };
+  const response = { companyName, location };
+
+  if (profile.publicInfo) {
+    response = { ...response, ...profile.publicInfo };
+  }
 
   res.status(200).json(response);
 };

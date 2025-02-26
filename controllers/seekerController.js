@@ -122,11 +122,15 @@ export const getSeekerProfile = async (req, res) => {
   const userName = `${profile.regData.firstName} ${profile.regData.lastName}`;
   const location = `${profile.regData.country}, ${profile.regData.city}`;
   const dateOfBirth = profile.regData.dateOfBirth;
-  let response = { ...profile.publicInfo, userName, location, dateOfBirth };
+  let response = { userName, location, dateOfBirth };
 
-  if (response.work) {
-    const totalExperience = countTotalWorkExperience(response.work);
-    response.totalWorkExperience = totalExperience;
+  if (profile.publicInfo) {
+    response = { ...response, ...profile.publicInfo };
+
+    if (response.work) {
+      const totalExperience = countTotalWorkExperience(response.work);
+      response.totalWorkExperience = totalExperience;
+    }
   }
 
   res.status(200).json(response);
