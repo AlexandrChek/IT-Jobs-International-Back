@@ -124,6 +124,10 @@ export const getSeekerProfile = async (req, res) => {
   const dateOfBirth = profile.regData.dateOfBirth;
   let response = { userName, location, dateOfBirth };
 
+  if (profile.isDisabled) {
+    response.isDisabled = true;
+  }
+
   if (profile.publicInfo) {
     response = { ...response, ...profile.publicInfo };
 
