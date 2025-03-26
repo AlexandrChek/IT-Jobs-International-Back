@@ -15,7 +15,7 @@ export const createJob = async (req, res) => {
   const { companyid } = req.params;
   let profiles = await readJSON(COMPANY_PROFILES);
   const profileIndex = getProfileIndexById(profiles, 'company', companyid);
-  const job = { ...req.body, jobId: nanoid(8) };
+  const job = { ...req.body, companyId: companyid, jobId: nanoid(8) };
   const normJob = makeWorkplacesAnArray(job);
 
   if (profiles.profiles[profileIndex].publicInfo.jobs) {
@@ -48,7 +48,7 @@ export const getJob = async (req, res) => {
   let job = profiles.profiles[profileIndex].publicInfo.jobs.find(job => job.jobId === jobid);
   const companyName = profiles.profiles[profileIndex].regData.companyName;
 
-  job = { ...job, companyId: companyid, companyName };
+  job = { ...job, companyName };
 
   res.status(200).json(job);
 };
