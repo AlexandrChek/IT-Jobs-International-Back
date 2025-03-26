@@ -45,12 +45,10 @@ export const getJob = async (req, res) => {
   const { companyid, jobid } = req.params;
   const profiles = await readJSON(COMPANY_PROFILES);
   const profileIndex = getProfileIndexById(profiles, 'company', companyid);
-  let job = profiles.profiles[profileIndex].publicInfo.jobs.find(job => job.jobId === jobid);
+  const job = profiles.profiles[profileIndex].publicInfo.jobs.find(job => job.jobId === jobid);
   const companyName = profiles.profiles[profileIndex].regData.companyName;
 
-  job = { ...job, companyName };
-
-  res.status(200).json(job);
+  res.status(200).json({ ...job, companyName });
 };
 //-----------------------------------------------------------------------------------------
 export const toggleJobStatus = async (req, res) => {
