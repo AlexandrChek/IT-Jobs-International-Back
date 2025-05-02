@@ -75,9 +75,9 @@ app.post('/search/job', upload.none(), searchJob);
 
 // Chat request handlers
 app.post('/create_chat', upload.single('cvFile'), createChat);
-app.post('/add_chat_message', addChatMessage);
+app.post('/add_chat_message', upload.none(), addChatMessage);
 app.get('/chat_list/:usertype/:userid', getUserChats);
-app.post('/chat', getChat);
+app.get('/chat/:companyid/:seekerid/:jobid', getChat);
 
 // Common handlers
 app.post('/login', upload.none(), logIn);
