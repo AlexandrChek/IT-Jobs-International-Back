@@ -192,16 +192,9 @@ export const searchCv = async (req, res) => {
     ].every(Boolean);
 
     if (isMatching) {
-      const location = `${profile.regData.country}, ${profile.regData.city}`;
-      let matchingObject = {
-        seekerId: profile.seekerId,
-        position: profile.publicInfo.position,
-        location,
-      };
-
-      if (profile.publicInfo.salary) {
-        matchingObject.salary = profile.publicInfo.salary;
-      }
+      const { country, city } = profile.regData;
+      const { position, salary } = profile.publicInfo;
+      const matchingObject = {seekerId: profile.seekerId, country, city, position, salary};
 
       results.push(matchingObject);
     }

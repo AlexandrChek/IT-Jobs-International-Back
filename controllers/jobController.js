@@ -103,21 +103,8 @@ export const searchJob = async (req, res) => {
       ].every(Boolean);
 
       if (isMatching) {
-        let matchingObject = {
-          companyId: profile.companyId,
-          jobId: job.jobId,
-          position: job.position,
-        };
-
-        if (job.salary) {
-          matchingObject.salary = job.salary;
-        }
-
-        const location = job.country ? `${job.country}${job.city ? `, ${job.city}` : ''}` : null;
-
-        if (location) {
-          matchingObject.location = location;
-        }
+        const { companyId, jobId, position, salary, country, city } = job;
+        const matchingObject = { companyId, jobId, position, salary, country, city };
 
         results.push(matchingObject);
       }
