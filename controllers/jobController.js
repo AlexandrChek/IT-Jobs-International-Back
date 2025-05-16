@@ -34,8 +34,10 @@ export const editJob = async (req, res) => {
   let profiles = await readJSON(COMPANY_PROFILES);
   const profileIndex = getProfileIndexById(profiles, 'company', companyid);
   const jobIndex = getJobIndexById(profiles, profileIndex, jobid);
+  let job = makeWorkplacesAnArray(req.body);
+  job = { ...job, companyId: companyid, jobId: jobid };
 
-  profiles.profiles[profileIndex].publicInfo.jobs[jobIndex] = makeWorkplacesAnArray(req.body);
+  profiles.profiles[profileIndex].publicInfo.jobs[jobIndex] = job;
   await writeJSON(COMPANY_PROFILES, profiles);
 
   res.sendStatus(200);

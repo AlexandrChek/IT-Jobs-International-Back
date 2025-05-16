@@ -194,7 +194,7 @@ export const searchCv = async (req, res) => {
     if (isMatching) {
       const { country, city } = profile.regData;
       const { position, salary } = profile.publicInfo;
-      const matchingObject = {seekerId: profile.seekerId, country, city, position, salary};
+      const matchingObject = { seekerId: profile.seekerId, country, city, position, salary };
 
       results.push(matchingObject);
     }
