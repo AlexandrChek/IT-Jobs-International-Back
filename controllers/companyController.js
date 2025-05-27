@@ -46,7 +46,7 @@ export const saveCompanyProfile = async (req, res) => {
   const { companyid } = req.params;
   let profiles = await readJSON(COMPANY_PROFILES);
   const profileIndex = getProfileIndexById(profiles, 'company', companyid);
-  const jobs = profiles.profiles[profileIndex].publicInfo.jobs || [];
+  const jobs = profiles.profiles[profileIndex]?.publicInfo?.jobs || [];
 
   profiles.profiles[profileIndex].publicInfo = { ...req.body, jobs };
   await writeJSON(COMPANY_PROFILES, profiles);
