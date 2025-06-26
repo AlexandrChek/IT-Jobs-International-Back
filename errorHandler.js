@@ -11,6 +11,8 @@ const errorHandler = (err, res) => {
     errObj.name = 'CloudinaryError';
     errObj.message = err.message || err.error?.message || err.error?.details;
     statusCode = err.http_code;
+  } else if (err.name === 'MulterError') {
+    statusCode = 400;
   }
 
   res.status(statusCode).json(errObj);
