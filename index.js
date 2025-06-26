@@ -33,6 +33,7 @@ import { createChat, addChatMessage, getUserChats, getChat } from './controllers
 import { logIn } from './controllers/commonController.js';
 import errorHandler from './errorHandler.js';
 
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 // Middleware
@@ -79,6 +80,6 @@ app.get('/ping', (req, res) => res.sendStatus(200));
 // Error handler
 app.use((err, req, res, next) => errorHandler(err, res));
 
-app.listen(3000, () => {
-  console.log('Server started');
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
