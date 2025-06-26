@@ -1,15 +1,27 @@
 import multer from 'multer';
-import { CV_DIR } from './index.js';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, CV_DIR);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
+const storage = multer.memoryStorage();
+
+const fileFilter = (req, file, cb) => {
+  const allowedMimeTypes = [
+    'application/pdf', // PDF
+    'application/msword', // DOC
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // DOCX
+    'application/rtf', // RTF
+    'application/vnd.oasis.opendocument.text', // ODT
+  ];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type.'), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 200 * 1024 },
+  fileFilter,
 });
-
-const upload = multer({ storage });
 
 export default upload;

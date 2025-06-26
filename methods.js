@@ -1,18 +1,51 @@
-import fs from 'fs/promises';
-import { COMPANY_PROFILES, SEEKER_PROFILES } from './index.js';
+import cloudinary from './cloudinaryConfig.js';
+import { Readable } from 'stream';
 import { englishLevels } from './constants.js';
 
 // Fn to read JSON-files:
-export const readJSON = async filePath => JSON.parse(await fs.readFile(filePath, 'utf-8'));
+export const readJSON = async publicId => {
+  const fileData = await cloudinary.api.resource(publicId, { resource_type: 'raw' });
+  const jsonData = await fetch(fileData.srcure_url);
+
+  if (!jsonData.ok) {
+    let error = new Error('HTTP connection problem');
+    error.http_code = jsonData.status;
+    throw error;
+  }
+
+  return await jsonData.json();
+};
 
 // Fn to write JSON-files:
-export const writeJSON = async (filePath, data) =>
-  await fs.writeFile(filePath, JSON.stringify(data));
+export const writeJSON = async (publicId, data) => {
+  const buffer = Buffer.from(JSON.stringify(data));
+  const stream = Readable.from(buffer);
+
+  await new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          public_id: publicId,
+          resource_type: 'raw',
+          folder: 'it-jobs-int-back/JSON',
+          overWrite: true,
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        },
+      )
+      .end(stream);
+  });
+};
 
 // Fn to check if the e-mail in the body exists in other profiles:
 export const checkIfEmailExist = async (email, userType = '', id = '') => {
-  let companyProfiles = await readJSON(COMPANY_PROFILES);
-  let seekerProfiles = await readJSON(SEEKER_PROFILES);
+  let companyProfiles = await readJSON('companyProfiles.json');
+  let seekerProfiles = await readJSON('seekerProfiles.json');
 
   if (userType === 'company') {
     companyProfiles = removeProfileById(companyProfiles, userType, id);
@@ -25,7 +58,7 @@ export const checkIfEmailExist = async (email, userType = '', id = '') => {
   const isEmailExistsInCompanies = companyProfiles.profiles.some(checkIfEmailsMatch);
   const isEmailExistsInSeekers = seekerProfiles.profiles.some(checkIfEmailsMatch);
 
-  return !(isEmailExistsInCompanies || isEmailExistsInSeekers);
+  return isEmailExistsInCompanies || isEmailExistsInSeekers;
 };
 
 // Fn to find the profile by ID:

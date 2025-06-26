@@ -1,5 +1,4 @@
 import { nanoid } from 'nanoid';
-import { SEEKER_PROFILES } from '../index.js';
 import {
   readJSON,
   writeJSON,
@@ -19,13 +18,13 @@ import {
 import { emailDoesAlreadyExistResponse } from '../constants.js';
 
 export const signUpSeeker = async (req, res) => {
-  const emailDoesntExist = await checkIfEmailExist(req.body.email);
+  const doesEmailExist = await checkIfEmailExist(req.body.email);
 
-  if (emailDoesntExist) {
-    let profiles = await readJSON(SEEKER_PROFILES);
+  if (!doesEmailExist) {
+    let profiles = await readJSON('seekerProfiles.json');
 
     profiles.profiles.push({ seekerId: nanoid(7), regData: req.body });
-    await writeJSON(SEEKER_PROFILES, profiles);
+    await writeJSON('seekerProfiles.json', profiles);
 
     res.sendStatus(200);
   } else {
@@ -35,14 +34,14 @@ export const signUpSeeker = async (req, res) => {
 //-----------------------------------------------------------------------------------------
 export const editSeekerRegData = async (req, res) => {
   const { seekerid } = req.params;
-  const emailDoesntExist = await checkIfEmailExist(req.body.email, 'seeker', seekerid);
+  const doesEmailExist = await checkIfEmailExist(req.body.email, 'seeker', seekerid);
 
-  if (emailDoesntExist) {
-    let profiles = await readJSON(SEEKER_PROFILES);
+  if (!doesEmailExist) {
+    let profiles = await readJSON('seekerProfiles.json');
     const profileIndex = getProfileIndexById(profiles, 'seeker', seekerid);
 
     profiles.profiles[profileIndex].regData = { ...req.body };
-    await writeJSON(SEEKER_PROFILES, profiles);
+    await writeJSON('seekerProfiles.json', profiles);
 
     res.sendStatus(200);
   } else {
@@ -52,7 +51,7 @@ export const editSeekerRegData = async (req, res) => {
 //-----------------------------------------------------------------------------------------
 export const saveSeekerProfile = async (req, res) => {
   const { seekerid } = req.params;
-  let profiles = await readJSON(SEEKER_PROFILES);
+  let profiles = await readJSON('seekerProfiles.json');
   const profileIndex = getProfileIndexById(profiles, 'seeker', seekerid);
 
   // Fn to convert properties of work experience or education in a seeker public info object
@@ -102,14 +101,14 @@ export const saveSeekerProfile = async (req, res) => {
   }
 
   profiles.profiles[profileIndex].publicInfo = makeWorkplacesAnArray(normalizedPublicInfo);
-  await writeJSON(SEEKER_PROFILES, profiles);
+  await writeJSON('seekerProfiles.json', profiles);
 
   res.sendStatus(200);
 };
 //-----------------------------------------------------------------------------------------
 export const getSeekerRegData = async (req, res) => {
   const { seekerid } = req.params;
-  const profiles = await readJSON(SEEKER_PROFILES);
+  const profiles = await readJSON('seekerProfiles.json');
   const profile = getProfileById(profiles, 'seeker', seekerid);
 
   res.status(200).json(profile.regData);
@@ -117,7 +116,7 @@ export const getSeekerRegData = async (req, res) => {
 //-----------------------------------------------------------------------------------------
 export const getSeekerProfile = async (req, res) => {
   const { seekerid } = req.params;
-  const profiles = await readJSON(SEEKER_PROFILES);
+  const profiles = await readJSON('seekerProfiles.json');
   const profile = getProfileById(profiles, 'seeker', seekerid);
   const userName = `${profile.regData.firstName} ${profile.regData.lastName}`;
   const location = `${profile.regData.country}, ${profile.regData.city}`;
@@ -142,7 +141,7 @@ export const getSeekerProfile = async (req, res) => {
 //-----------------------------------------------------------------------------------------
 export const toggleSeekerStatus = async (req, res) => {
   const { seekerid } = req.params;
-  let profiles = await readJSON(SEEKER_PROFILES);
+  let profiles = await readJSON('seekerProfiles.json');
   const profileIndex = getProfileIndexById(profiles, 'seeker', seekerid);
 
   if (profiles.profiles[profileIndex].isDisabled) {
@@ -151,24 +150,24 @@ export const toggleSeekerStatus = async (req, res) => {
     profiles.profiles[profileIndex].isDisabled = true;
   }
 
-  await writeJSON(SEEKER_PROFILES, profiles);
+  await writeJSON('seekerProfiles.json', profiles);
 
   res.sendStatus(200);
 };
 //-----------------------------------------------------------------------------------------
 export const removeSeekerProfile = async (req, res) => {
   const { seekerid } = req.params;
-  const profiles = await readJSON(SEEKER_PROFILES);
+  const profiles = await readJSON('seekerProfiles.json');
   const clearedProfiles = removeProfileById(profiles, 'seeker', seekerid);
 
-  await writeJSON(SEEKER_PROFILES, clearedProfiles);
+  await writeJSON('seekerProfiles.json', clearedProfiles);
 
   res.sendStatus(200);
 };
 //-----------------------------------------------------------------------------------------
 export const searchCv = async (req, res) => {
   const searchCriteria = makeWorkplacesAnArray(req.body);
-  const profiles = await readJSON(SEEKER_PROFILES);
+  const profiles = await readJSON('seekerProfiles.json');
   let results = [];
 
   for (const profile of profiles.profiles) {

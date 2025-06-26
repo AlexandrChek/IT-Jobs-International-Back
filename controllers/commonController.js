@@ -1,10 +1,9 @@
-import { COMPANY_PROFILES, SEEKER_PROFILES } from '../index.js';
 import { readJSON } from '../methods.js';
 
 export const logIn = async (req, res) => {
   const { userType, email, password } = req.body;
-  const profilesPath = userType === 'company' ? COMPANY_PROFILES : SEEKER_PROFILES;
-  const profiles = await readJSON(profilesPath);
+  const profilesPublicId = userType === 'company' ? 'companyProfiles.json' : 'seekerProfiles.json';
+  const profiles = await readJSON(profilesPublicId);
   const profile = profiles.profiles.find(
     profile => profile.regData.email === email && profile.regData.password === password,
   );

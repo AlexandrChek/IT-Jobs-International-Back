@@ -1,8 +1,7 @@
-import { CHATS, COMPANY_PROFILES, SEEKER_PROFILES } from '../index.js';
 import { readJSON, writeJSON, getProfileById } from '../methods.js';
 
 export const createChat = async (req, res) => {
-  let chats = await readJSON(CHATS);
+  let chats = await readJSON('chats.json');
   const { seekerId, companyId, userName, userType, jobId, position, date, message } = req.body;
   const chatIndex = chats.chats.findIndex(
     chat => chat.company.id === companyId && chat.seeker.id === seekerId,
@@ -14,7 +13,7 @@ export const createChat = async (req, res) => {
   };
 
   if (req.file) {
-    chat.messages[0].cvFileLink = `/cv/${req.file.filename}`;
+    chat.messages[0].cvFileLink = req.file.cloudinaryUrl;
   }
 
   if (chatIndex >= 0) {
@@ -23,7 +22,8 @@ export const createChat = async (req, res) => {
     const isCompany = userType === 'company';
     const participantType = isCompany ? 'seeker' : 'company';
     const participantId = isCompany ? seekerId : companyId;
-    const participantProfiles = await readJSON(isCompany ? SEEKER_PROFILES : COMPANY_PROFILES);
+    const participantFilePublicId = isCompany ? 'seekerProfiles.json' : 'companyProfiles.json';
+    const participantProfiles = await readJSON(participantFilePublicId);
     const participantProfile = getProfileById(participantProfiles, participantType, participantId);
     const companyName = isCompany ? userName : participantProfile.regData.companyName;
     const seekerName = isCompany
@@ -38,13 +38,13 @@ export const createChat = async (req, res) => {
     chats.chats.push(chatObj);
   }
 
-  await writeJSON(CHATS, chats);
+  await writeJSON('chats.json', chats);
 
   res.sendStatus(200);
 };
 //-----------------------------------------------------------------------------------------
 export const addChatMessage = async (req, res) => {
-  let chats = await readJSON(CHATS);
+  let chats = await readJSON('chats.json');
   const { companyId, seekerId, jobId, message } = req.body;
   const chatIndex = chats.chats.findIndex(
     chat => chat.company.id === companyId && chat.seeker.id === seekerId,
@@ -55,7 +55,7 @@ export const addChatMessage = async (req, res) => {
 
   chats.chats[chatIndex].twoUsersChats[chatAboutPositionIndex].messages.push(message);
 
-  await writeJSON(CHATS, chats);
+  await writeJSON('chats.json', chats);
 
   res.sendStatus(200);
 };
@@ -63,7 +63,7 @@ export const addChatMessage = async (req, res) => {
 export const getUserChats = async (req, res) => {
   const { usertype, userid } = req.params;
   const chatParticipantType = usertype === 'company' ? 'seeker' : 'company';
-  const chats = await readJSON(CHATS);
+  const chats = await readJSON('chats.json');
   const matchedChats = chats.chats.filter(chat => chat[usertype].id === userid);
   let chatList = [];
 
@@ -85,7 +85,7 @@ export const getUserChats = async (req, res) => {
 //-----------------------------------------------------------------------------------------
 export const getChat = async (req, res) => {
   const { companyId, seekerId, jobId } = req.params;
-  const chats = await readJSON(CHATS);
+  const chats = await readJSON('chats.json');
   const chatObj = chats.chats.find(
     chat => chat.company.id === companyId && chat.seeker.id === seekerId,
   );

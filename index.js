@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import upload from './multerConfig.js';
+import { cloudinaryUpload } from './cloudinaryConfig.js';
 import {
   signUpCompany,
   editCompanyRegData,
@@ -31,20 +31,13 @@ import {
 } from './controllers/jobController.js';
 import { createChat, addChatMessage, getUserChats, getChat } from './controllers/chatController.js';
 import { logIn } from './controllers/commonController.js';
+import errorHandler from './errorHandler.js';
 
 const app = express();
-
-// Paths to files and folders
-export const USER_DATA_DIR = './user_data/';
-export const CV_DIR = path.join(USER_DATA_DIR, 'CVs');
-export const SEEKER_PROFILES = path.join(USER_DATA_DIR, 'seekerProfiles.json');
-export const COMPANY_PROFILES = path.join(USER_DATA_DIR, 'companyProfiles.json');
-export const CHATS = path.join(USER_DATA_DIR, 'chats.json');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use('/cv', express.static(CV_DIR));
 
 // Company request handlers
 app.post('/sign_up/company', upload.none(), signUpCompany);
@@ -74,13 +67,17 @@ app.get('/remove/job/:companyid/:jobid', removeJob);
 app.post('/search/job', upload.none(), searchJob);
 
 // Chat request handlers
-app.post('/create_chat', upload.single('cvFile'), createChat);
+app.post('/create_chat', upload.single('cvFile'), cloudinaryUpload, createChat);
 app.post('/add_chat_message', upload.none(), addChatMessage);
 app.get('/chat_list/:usertype/:userid', getUserChats);
 app.get('/chat/:companyid/:seekerid/:jobid', getChat);
 
 // Common handlers
 app.post('/login', upload.none(), logIn);
+app.get('/ping', (req, res) => res.sendStatus(200));
+
+// Error handler
+app.use((err, req, res, next) => errorHandler(err, res));
 
 app.listen(3000, () => {
   console.log('Server started');
