@@ -1,9 +1,9 @@
 import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
-  cloud_name: 'dzy3u2mhd',
-  api_key: '397233177835187',
-  api_secret: 'xklwC54H3a48hhyiNt8jri7GX2s',
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
 });
 
 export const cloudinaryUpload = (req, res, next) => {
