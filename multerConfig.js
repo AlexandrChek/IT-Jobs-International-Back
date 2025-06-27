@@ -8,7 +8,6 @@ const fileFilter = (req, file, cb) => {
     'application/msword', // DOC
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // DOCX
     'application/rtf', // RTF
-    'application/vnd.oasis.opendocument.text', // ODT
   ];
 
   if (allowedMimeTypes.includes(file.mimetype)) {

@@ -1,4 +1,6 @@
 const errorHandler = (err, res) => {
+  console.error(err);
+
   let statusCode = 500;
 
   let errObj = {
