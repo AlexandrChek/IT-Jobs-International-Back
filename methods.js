@@ -5,7 +5,7 @@ import { englishLevels } from './constants.js';
 // Fn to read JSON-files:
 export const readJSON = async publicId => {
   const fileData = await cloudinary.api.resource(publicId, { resource_type: 'raw' });
-  const jsonData = await fetch(fileData.srcure_url);
+  const jsonData = await fetch(fileData.secure_url);
 
   if (!jsonData.ok) {
     let error = new Error('HTTP connection problem');
