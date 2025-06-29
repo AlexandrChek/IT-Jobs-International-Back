@@ -25,7 +25,6 @@ export const writeJSON = (publicId, data) => {
         {
           public_id: publicId,
           resource_type: 'raw',
-          folder: 'it-jobs-int-back/JSON',
           overwrite: true,
         },
         (error, result) => {
