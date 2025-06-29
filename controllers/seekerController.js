@@ -118,6 +118,7 @@ export const getSeekerProfile = async (req, res) => {
   const { seekerid } = req.params;
   const profiles = await readJSON('seekerProfiles.json');
   const profile = getProfileById(profiles, 'seeker', seekerid);
+  console.log(profile)
   const userName = `${profile.regData.firstName} ${profile.regData.lastName}`;
   const location = `${profile.regData.country}, ${profile.regData.city}`;
   const dateOfBirth = profile.regData.dateOfBirth;
