@@ -1,5 +1,4 @@
 import cloudinary from './cloudinaryConfig.js';
-import { Readable } from 'stream';
 import { englishLevels } from './constants.js';
 
 // Fn to read JSON-files:
@@ -19,7 +18,6 @@ export const readJSON = async publicId => {
 // Fn to write JSON-files:
 export const writeJSON = async (publicId, data) => {
   const buffer = Buffer.from(JSON.stringify(data));
-  const stream = Readable.from(buffer);
 
   await new Promise((resolve, reject) => {
     cloudinary.uploader
@@ -28,7 +26,7 @@ export const writeJSON = async (publicId, data) => {
           public_id: publicId,
           resource_type: 'raw',
           folder: 'it-jobs-int-back/JSON',
-          overWrite: true,
+          overwrite: true,
         },
         (error, result) => {
           if (error) {
@@ -38,7 +36,7 @@ export const writeJSON = async (publicId, data) => {
           }
         },
       )
-      .end(stream);
+      .end(buffer);
   });
 };
 
