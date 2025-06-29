@@ -16,10 +16,10 @@ export const readJSON = async publicId => {
 };
 
 // Fn to write JSON-files:
-export const writeJSON = async (publicId, data) => {
+export const writeJSON = (publicId, data) => {
   const buffer = Buffer.from(JSON.stringify(data));
 
-  await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     cloudinary.uploader
       .upload_stream(
         {
