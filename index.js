@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import { setCloudConfig, cloudinaryUpload } from './cloudinaryConfig.js';
 import upload from './multerConfig.js';
-import { cloudinaryUpload } from './cloudinaryConfig.js';
 import {
   signUpCompany,
   editCompanyRegData,
@@ -32,6 +32,17 @@ import {
 import { createChat, addChatMessage, getUserChats, getChat } from './controllers/chatController.js';
 import { logIn } from './controllers/commonController.js';
 import errorHandler from './errorHandler.js';
+
+// Differences between development and production modes
+if (process.env.NODE_ENV === 'development') {
+  import('dotenv').then(dotenv => {
+    dotenv.config();
+    setCloudConfig();
+  });
+} else {
+  setCloudConfig();
+}
+//-----------------------------------------------------
 
 const PORT = process.env.PORT || 3000;
 const app = express();
