@@ -84,12 +84,12 @@ export const getUserChats = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------
 export const getChat = async (req, res) => {
-  const { companyId, seekerId, jobId } = req.params;
+  const { companyid, seekerid, jobid } = req.params;
   const chats = await readJSON('chats.json');
-  const chatObj = chats.chats.find(
-    chat => chat.company.id === companyId && chat.seeker.id === seekerId,
+  const relevantChatsObj = chats.chats.find(
+    chat => chat.company.id === companyid && chat.seeker.id === seekerid,
   );
-  const chat = chatObj.twoUsersChats.find(chat => chat.job.jobId === jobId);
+  const chat = relevantChatsObj.twoUsersChats.find(chat => chat.job.jobId === jobid);
 
   res.send(200).json(chat);
 };
