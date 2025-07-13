@@ -11,12 +11,17 @@ export const setCloudConfig = () => {
 export const cloudinaryUpload = (req, res, next) => {
   if (!req.file) return next();
 
+  const publicId = `${Date.now()}_${req.file.originalname}`;
+
   cloudinary.uploader
-    .upload_stream({ resource_type: 'raw', folder: 'it-jobs-int-back/CVs' }, (error, result) => {
-      if (error) return next(error);
-      req.file.cloudinaryUrl = result.secure_url;
-      next();
-    })
+    .upload_stream(
+      { resource_type: 'raw', folder: 'it-jobs-int-back/CVs', public_id: publicId },
+      (error, result) => {
+        if (error) return next(error);
+        req.file.cloudinaryUrl = result.secure_url;
+        next();
+      },
+    )
     .end(req.file.buffer);
 };
 

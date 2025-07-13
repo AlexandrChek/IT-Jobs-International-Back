@@ -9,12 +9,10 @@ export const createChat = async (req, res) => {
 
   let chat = {
     job: { jobId, position },
-    messages: [{ date, name: userName, text: message }],
+    messages: [
+      { date, name: userName, text: message, cvFileLink: req.file?.cloudinaryUrl || null },
+    ],
   };
-
-  if (req.file) {
-    chat.messages[0].cvFileLink = req.file.cloudinaryUrl;
-  }
 
   if (chatIndex >= 0) {
     chats.chats[chatIndex].twoUsersChats.push(chat);
