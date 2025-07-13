@@ -91,5 +91,5 @@ export const getChat = async (req, res) => {
   );
   const chat = relevantChatsObj.twoUsersChats.find(chat => chat.job.jobId === jobid);
 
-  res.send(200).json(chat);
+  res.status(200).json(chat);
 };
