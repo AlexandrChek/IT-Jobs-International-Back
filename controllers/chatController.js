@@ -82,12 +82,15 @@ export const getUserChats = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------
 export const getChat = async (req, res) => {
-  const { companyid, seekerid, jobid } = req.params;
+  const { usertype, companyid, seekerid, jobid } = req.params;
+  const chatParticipantType = usertype === 'company' ? 'seeker' : 'company';
   const chats = await readJSON('chats.json');
   const relevantChatsObj = chats.chats.find(
     chat => chat.company.id === companyid && chat.seeker.id === seekerid,
   );
-  const chat = relevantChatsObj.twoUsersChats.find(chat => chat.job.jobId === jobid);
+  const chatParticipantName = relevantChatsObj[chatParticipantType].name;
+  let chat = relevantChatsObj.twoUsersChats.find(chat => chat.job.jobId === jobid);
+  chat.chatParticipantName = chatParticipantName;
 
   res.status(200).json(chat);
 };
