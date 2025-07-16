@@ -82,7 +82,7 @@ app.post('/search/job', upload.none(), searchJob);
 app.post('/create_chat', upload.single('cvFile'), cloudinaryUpload, createChat);
 app.post('/add_chat_message', upload.none(), addChatMessage);
 app.get('/chat_list/:usertype/:userid', getUserChats);
-app.get('/chat/:companyid/:seekerid/:jobid', getChat);
+app.get('/chat/:usertype/:companyid/:seekerid/:jobid', getChat);
 
 // Common handlers
 app.post('/login', upload.none(), logIn);
