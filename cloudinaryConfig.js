@@ -11,7 +11,10 @@ export const setCloudConfig = () => {
 export const cloudinaryUpload = (req, res, next) => {
   if (!req.file) return next();
 
-  const publicId = `${Date.now()}_${req.file.originalname}`;
+  let originalNameArr = req.file.originalname.split('.');
+  const extension = originalNameArr.pop().toLowerCase();
+  const fileName = originalNameArr.join('_').replace(/[^a-zA-Z0-9\-_]/g, '_');
+  const publicId = `${Date.now()}_${fileName}.${extension}`;
 
   cloudinary.uploader
     .upload_stream(
