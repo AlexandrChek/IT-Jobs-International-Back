@@ -10,10 +10,13 @@ const fileFilter = (req, file, cb) => {
     'application/rtf', // RTF
   ];
 
+  let filterError = new Error('Invalid file type.');
+  filterError.name = 'MulterError';
+
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type.'), false);
+    cb(filterError, false);
   }
 };
 
