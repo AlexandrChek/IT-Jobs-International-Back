@@ -31,6 +31,8 @@ import {
 } from './controllers/jobController.js';
 import { createChat, addChatMessage, getUserChats, getChat } from './controllers/chatController.js';
 import { logIn } from './controllers/commonController.js';
+import about from './text_content/about.js';
+import privacy from './text_content/privacy.js';
 import errorHandler from './errorHandler.js';
 
 // Differences between development and production modes
@@ -86,6 +88,8 @@ app.get('/chat/:usertype/:companyid/:seekerid/:jobid', getChat);
 
 // Common handlers
 app.post('/login', upload.none(), logIn);
+app.get('/about', (req, res) => res.status(200).json(about));
+app.get('/privacy', (req, res) => res.status(200).json(privacy));
 app.get('/ping', (req, res) => res.sendStatus(200));
 
 // Error handler
