@@ -96,7 +96,7 @@ export const getCompanyJobList = async (req, res) => {
     let jobs = [];
 
     currentJobs.forEach(job => {
-      jobs.push({ jobId: job.jobId, position: job.position });
+      jobs.push({ id: job.jobId, value: job.position });
     });
 
     res.status(200).json(jobs);
