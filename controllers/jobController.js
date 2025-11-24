@@ -8,6 +8,7 @@ import {
   compareMeaning,
   checkPosition,
   checkWorkplaces,
+  checkSkills,
 } from '../methods.js';
 
 export const createJob = async (req, res) => {
@@ -101,6 +102,7 @@ export const searchJob = async (req, res) => {
         !searchCriteria.workplaces || checkWorkplaces(searchCriteria.workplaces, job),
         !searchCriteria.isRelocationPossible || job.isRelocationPossible,
         !searchCriteria.experienceIsNotRequired || job.experienceIsNotRequired,
+        !searchCriteria.skills || checkSkills(searchCriteria.skills, job.skills),
       ].every(Boolean);
 
       if (isMatching) {

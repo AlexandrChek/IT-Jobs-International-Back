@@ -156,13 +156,11 @@ export const checkWorkExperience = (worksArr, requiredYears = '', requiredMonths
   } else return false;
 };
 
-// Fn to check if seeker`s skills match the search criteria:
-export const checkSkills = (requiredSkills, seekerSkills) => {
-  if (seekerSkills) {
-    const seekerSkillsArr = seekerSkills.split(/,|, /).map(skill => skill.trim().toLowerCase());
+// Fn to check if skills being checked match the search criteria:
+export const checkSkills = (requiredSkills, currentSkills) => {
+  if (currentSkills) {
     const requiredSkillsArr = requiredSkills.split(/,|, /).map(skill => skill.trim().toLowerCase());
-
-    return requiredSkillsArr.every(skill => seekerSkillsArr.includes(skill));
+    return requiredSkillsArr.every(skill => currentSkills.includes(skill.split(/\./)[0]));
   } else return false;
 };
 
