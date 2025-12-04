@@ -90,21 +90,22 @@ export const makeWorkplacesAnArray = body => {
   return normBody;
 };
 
+// Fn to bring text into a comparable form:
+export const normalizeText = text => text.trim().toLowerCase().replaceAll('  ', ' ');
+
 // Fn to compare meaning of two strings:
 export const compareMeaning = (requiredValue, valueToBeChecked) => {
-  return requiredValue.toLowerCase() === valueToBeChecked.toLowerCase();
+  return normalizeText(requiredValue) === normalizeText(valueToBeChecked);
 };
 
 // Fn to check if a position in a CV or job matches the search criteria:
-export const checkPosition = (searchCriteria, jobOrCv) => {
-  const userPosition = jobOrCv.position.toLowerCase();
+export const checkPosition = (requiredPosition, searchOfAnyWord, userPosition) => {
+  const normRequiredPosition = normalizeText(requiredPosition);
+  const normUserPosition = normalizeText(userPosition);
 
-  if (searchCriteria.searchOfAnyWord) {
-    const positionWordsArr = searchCriteria.position.split(/ |, /);
-    return positionWordsArr.some(word => userPosition.includes(word.toLowerCase()));
-  } else {
-    return userPosition.includes(searchCriteria.position.toLowerCase());
-  }
+  return searchOfAnyWord
+    ? normRequiredPosition.split(/ |, /).some(word => normUserPosition.includes(word.split('.')[0]))
+    : normUserPosition.includes(normRequiredPosition);
 };
 
 // Fn to check if workplaces in a CV or job matches the search criteria:
@@ -157,10 +158,15 @@ export const checkWorkExperience = (worksArr, requiredYears = '', requiredMonths
 };
 
 // Fn to check if skills being checked match the search criteria:
-export const checkSkills = (requiredSkills, currentSkills) => {
+export const checkSkills = (requiredSkills, searchOfAnySkill, currentSkills) => {
   if (currentSkills) {
-    const requiredSkillsArr = requiredSkills.split(/,|, /).map(skill => skill.trim().toLowerCase());
-    return requiredSkillsArr.every(skill => currentSkills.includes(skill.split(/\./)[0]));
+    const requiredSkillsArr = normalizeText(requiredSkills).split(/,|, /);
+    const normCurrentSkills = normalizeText(currentSkills);
+    const checkTheSkill = skill => normCurrentSkills.includes(skill.split('.')[0]);
+
+    return !searchOfAnySkill
+      ? requiredSkillsArr.every(checkTheSkill)
+      : requiredSkillsArr.some(checkTheSkill);
   } else return false;
 };
 

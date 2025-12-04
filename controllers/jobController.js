@@ -97,12 +97,14 @@ export const searchJob = async (req, res) => {
         !searchCriteria.country ||
           (job.country && compareMeaning(searchCriteria.country, job.country)),
         !searchCriteria.city || (job.city && compareMeaning(searchCriteria.city, job.city)),
-        !searchCriteria.position || checkPosition(searchCriteria, job),
+        !searchCriteria.position ||
+          checkPosition(searchCriteria.position, searchCriteria.searchOfAnyWord, job.position),
         !searchCriteria.salary || (job.salary && +job.salary >= +searchCriteria.salary),
         !searchCriteria.workplaces || checkWorkplaces(searchCriteria.workplaces, job),
         !searchCriteria.isRelocationPossible || job.isRelocationPossible,
         !searchCriteria.experienceIsNotRequired || job.experienceIsNotRequired,
-        !searchCriteria.skills || checkSkills(searchCriteria.skills, job.skills),
+        !searchCriteria.skills ||
+          checkSkills(searchCriteria.skills, searchCriteria.searchOfAnySkill, job.skills),
       ].every(Boolean);
 
       if (isMatching) {

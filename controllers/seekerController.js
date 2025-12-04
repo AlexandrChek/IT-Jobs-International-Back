@@ -185,7 +185,12 @@ export const searchCv = async (req, res) => {
       !searchCriteria.isRelocationPossible || profile.publicInfo.isRelocationPossible,
       (!experienceFromYears && !experienceFromMonths) ||
         checkWorkExperience(profile.publicInfo.work, experienceFromYears, experienceFromMonths),
-      !searchCriteria.skills || checkSkills(searchCriteria.skills, profile.publicInfo.skills),
+      !searchCriteria.skills ||
+        checkSkills(
+          searchCriteria.skills,
+          searchCriteria.searchOfAnySkill,
+          profile.publicInfo.skills,
+        ),
       !searchCriteria.englishLevel ||
         checkEnglish(searchCriteria.englishLevel, profile.publicInfo.englishLevel),
     ].every(Boolean);
