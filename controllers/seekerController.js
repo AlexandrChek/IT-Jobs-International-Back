@@ -178,7 +178,12 @@ export const searchCv = async (req, res) => {
     const isMatching = [
       !searchCriteria.country || compareMeaning(searchCriteria.country, profile.regData.country),
       !searchCriteria.city || compareMeaning(searchCriteria.city, profile.regData.city),
-      !searchCriteria.position || checkPosition(searchCriteria, profile.publicInfo),
+      !searchCriteria.position ||
+        checkPosition(
+          searchCriteria.position,
+          searchCriteria.searchOfAnyWord,
+          profile.publicInfo.position,
+        ),
       !searchCriteria.salary ||
         (profile.publicInfo.salary && +profile.publicInfo.salary <= +searchCriteria.salary),
       !searchCriteria.workplaces || checkWorkplaces(searchCriteria.workplaces, profile.publicInfo),
