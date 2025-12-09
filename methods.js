@@ -1,5 +1,5 @@
 import cloudinary from './cloudinaryConfig.js';
-import { englishLevels } from './constants.js';
+import { englishLevels, spellingOptionsOfSkills } from './constants.js';
 
 // Fn to read JSON-files:
 export const readJSON = async publicId => {
@@ -44,6 +44,7 @@ export const checkIfEmailExist = async (email, userType = '', id = '') => {
   let companyProfiles = await readJSON('companyProfiles.json');
   let seekerProfiles = await readJSON('seekerProfiles.json');
 
+  //When EDITING registration data, we delete the current user`s profile from the array being checked
   if (userType === 'company') {
     companyProfiles = removeProfileById(companyProfiles, userType, id);
   }
@@ -104,8 +105,9 @@ export const checkPosition = (requiredPosition, searchOfAnyWord, userPosition) =
   const normUserPosition = normalizeText(userPosition);
 
   return searchOfAnyWord
-    ? normRequiredPosition.split(/ |, /).some(word => normUserPosition.includes(word.split('.')[0]))
-    : normUserPosition.includes(normRequiredPosition);
+    ? normRequiredPosition.split(/ |, /).some(word => normUserPosition.includes(word))
+    : normUserPosition.includes(normRequiredPosition) ||
+        normRequiredPosition.includes(normUserPosition);
 };
 
 // Fn to check if workplaces in a CV or job matches the search criteria:
@@ -146,36 +148,49 @@ export const countTotalWorkExperience = experienceArr => {
 
 // Fn to check if total work experience of seeker matches the search criteria:
 export const checkWorkExperience = (worksArr, requiredYears = '', requiredMonths = '') => {
-  if (worksArr) {
-    const { totalYears, totalMonths } = countTotalWorkExperience(worksArr);
-    const seekerExperienceInYears = totalYears + totalMonths / 12;
-    const requiredYearsNum = +requiredYears || 0;
-    const requiredMonthsNum = +requiredMonths || 0;
-    const requiredExperienceInYears = requiredYearsNum + requiredMonthsNum / 12;
+  if (!worksArr) return false;
 
-    return seekerExperienceInYears >= requiredExperienceInYears;
-  } else return false;
+  const { totalYears, totalMonths } = countTotalWorkExperience(worksArr);
+  const seekerExperienceInYears = totalYears + totalMonths / 12;
+  const requiredYearsNum = +requiredYears || 0;
+  const requiredMonthsNum = +requiredMonths || 0;
+  const requiredExperienceInYears = requiredYearsNum + requiredMonthsNum / 12;
+
+  return seekerExperienceInYears >= requiredExperienceInYears;
 };
 
 // Fn to check if skills being checked match the search criteria:
 export const checkSkills = (requiredSkills, searchOfAnySkill, currentSkills) => {
-  if (currentSkills) {
-    const requiredSkillsArr = normalizeText(requiredSkills).split(/,|, /);
-    const normCurrentSkills = normalizeText(currentSkills);
-    const checkTheSkill = skill => normCurrentSkills.includes(skill.split('.')[0]);
+  if (!currentSkills) return false;
 
-    return !searchOfAnySkill
-      ? requiredSkillsArr.every(checkTheSkill)
-      : requiredSkillsArr.some(checkTheSkill);
-  } else return false;
+  let requiredSkillsArr = normalizeText(requiredSkills).split(/,|, /);
+  let currentSkillsArr = normalizeText(currentSkills).split(/,|, /);
+
+  spellingOptionsOfSkills.forEach(item => {
+    const replaceOptions = skill => (skill === item.option ? item.standard : skill);
+
+    requiredSkillsArr = requiredSkillsArr.map(replaceOptions);
+    currentSkillsArr = currentSkillsArr.map(replaceOptions);
+  });
+
+  const makeComparable = skill => skill.replace(/-| /g, '').replace(/\.?js$/, '');
+
+  requiredSkillsArr = requiredSkillsArr.map(makeComparable);
+  currentSkillsArr = currentSkillsArr.map(makeComparable);
+
+  const checkTheSkill = rSkill => currentSkillsArr.includes(rSkill);
+
+  return searchOfAnySkill
+    ? requiredSkillsArr.some(checkTheSkill)
+    : requiredSkillsArr.every(checkTheSkill);
 };
 
 // Fn to check if seeker`s english level matches the search criterion:
 export const checkEnglish = (requiredLevel, currentLevel) => {
-  if (currentLevel) {
-    const currentLevelObj = englishLevels.find(level => level.name === currentLevel);
-    const requiredLevelObj = englishLevels.find(level => level.name === requiredLevel);
+  if (!currentLevel) return false;
 
-    return currentLevelObj.rating >= requiredLevelObj.rating;
-  } else return false;
+  const currentLevelObj = englishLevels.find(level => level.name === currentLevel);
+  const requiredLevelObj = englishLevels.find(level => level.name === requiredLevel);
+
+  return currentLevelObj.rating >= requiredLevelObj.rating;
 };
