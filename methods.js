@@ -163,8 +163,8 @@ export const checkWorkExperience = (worksArr, requiredYears = '', requiredMonths
 export const checkSkills = (requiredSkills, searchOfAnySkill, currentSkills) => {
   if (!currentSkills) return false;
 
-  let requiredSkillsArr = normalizeText(requiredSkills).split(/,|, /);
-  let currentSkillsArr = normalizeText(currentSkills).split(/,|, /);
+  let requiredSkillsArr = normalizeText(requiredSkills).split(/,\s*/);
+  let currentSkillsArr = normalizeText(currentSkills).split(/,\s*/);
 
   spellingOptionsOfSkills.forEach(item => {
     const replaceOptions = skill => (skill === item.option ? item.standard : skill);
