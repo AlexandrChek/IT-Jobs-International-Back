@@ -47,8 +47,14 @@ export const getJob = async (req, res) => {
   const { companyid, jobid } = req.params;
   const profiles = await readJSON('companyProfiles.json');
   const profileIndex = getProfileIndexById(profiles, 'company', companyid);
-  const job = profiles.profiles[profileIndex].publicInfo.jobs.find(job => job.jobId === jobid);
+  let job = profiles.profiles[profileIndex].publicInfo.jobs.find(job => job.jobId === jobid);
+  const city = job.city ? `, ${job.city}` : null;
+  const location = job.country ? job.country + city : null;
   const companyName = profiles.profiles[profileIndex].regData.companyName;
+
+  if (location) {
+    job.location = location;
+  }
 
   res.status(200).json({ ...job, companyName });
 };
