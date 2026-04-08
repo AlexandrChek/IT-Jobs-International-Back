@@ -85,6 +85,26 @@ export const removeJob = async (req, res) => {
   profiles.profiles[profileIndex].publicInfo.jobs.splice(jobIndex, 1);
   await writeJSON('companyProfiles.json', profiles);
 
+  let chats = await readJSON('chats.json');
+
+  if (!chats.chats.length) {
+    return res.sendStatus(200);
+  }
+
+  const newChats = chats.chats.map(chat => {
+    if (chat.company.id !== companyid) return chat;
+
+    const filteredTwoUsersChats = chat.twoUsersChats.filter(item => item.job.jobId !== jobid);
+    if (filteredTwoUsersChats.length === 0) return null;
+
+    return { ...chat, twoUsersChats: filteredTwoUsersChats };
+  });
+
+  const clearedChats = newChats.filter(Boolean);
+  chats.chats = clearedChats;
+
+  await writeJSON('chats.json', chats);
+
   res.sendStatus(200);
 };
 //-----------------------------------------------------------------------------------------
