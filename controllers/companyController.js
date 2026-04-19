@@ -6,6 +6,7 @@ import {
   getProfileById,
   getProfileIndexById,
   removeProfileById,
+  findIfChatExists,
 } from '../methods.js';
 import { emailDoesAlreadyExistResponse } from '../constants.js';
 
@@ -87,20 +88,21 @@ export const removeCompanyProfile = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------
 export const getCompanyJobList = async (req, res) => {
-  const { companyid } = req.params;
+  const { companyid, seekerid } = req.params;
   const profiles = await readJSON('companyProfiles.json');
   const profile = getProfileById(profiles, 'company', companyid);
   const currentJobs = profile.publicInfo.jobs?.filter(job => !job.isDisabled) || [];
 
-  if (currentJobs.length) {
-    let jobs = [];
+  if (!currentJobs.length) return res.sendStatus(204);
 
-    currentJobs.forEach(job => {
-      jobs.push({ id: job.jobId, value: job.position });
-    });
+  const chats = await readJSON('chats.json');
+  const jobs = currentJobs.map(job => {
+    return {
+      id: job.jobId,
+      value: job.position,
+      hasChat: findIfChatExists(chats, companyid, seekerid, job.jobId),
+    };
+  });
 
-    res.status(200).json(jobs);
-  } else {
-    res.sendStatus(204);
-  }
+  res.status(200).json(jobs);
 };

@@ -1,4 +1,10 @@
-import { readJSON, writeJSON, getProfileById } from '../methods.js';
+import {
+  readJSON,
+  writeJSON,
+  getProfileById,
+  getRelevantUsersChatsObj,
+  findIfChatExists,
+} from '../methods.js';
 
 export const createChat = async (req, res) => {
   let chats = await readJSON('chats.json');
@@ -85,12 +91,17 @@ export const getChat = async (req, res) => {
   const { usertype, companyid, seekerid, jobid } = req.params;
   const chatParticipantType = usertype === 'company' ? 'seeker' : 'company';
   const chats = await readJSON('chats.json');
-  const relevantChatsObj = chats.chats.find(
-    chat => chat.company.id === companyid && chat.seeker.id === seekerid,
-  );
+  const relevantChatsObj = getRelevantUsersChatsObj(chats, companyid, seekerid);
   const chatParticipantName = relevantChatsObj[chatParticipantType].name;
-  let chat = relevantChatsObj.twoUsersChats.find(chat => chat.job.jobId === jobid);
-  chat.chatParticipantName = chatParticipantName;
+  const chat = relevantChatsObj.twoUsersChats.find(chat => chat.job.jobId === jobid);
 
-  res.status(200).json(chat);
+  res.status(200).json({ ...chat, chatParticipantName });
+};
+//-----------------------------------------------------------------------------------------
+export const checkIfChatExists = async (req, res) => {
+  const { companyid, seekerid, jobid } = req.params;
+  const chats = await readJSON('chats.json');
+  const doesChatAlreadyExists = findIfChatExists(chats, companyid, seekerid, jobid);
+
+  res.status(200).json({ doesChatAlreadyExists });
 };

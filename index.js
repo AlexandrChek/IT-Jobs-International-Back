@@ -29,7 +29,13 @@ import {
   removeJob,
   searchJob,
 } from './controllers/jobController.js';
-import { createChat, addChatMessage, getUserChats, getChat } from './controllers/chatController.js';
+import {
+  createChat,
+  addChatMessage,
+  getUserChats,
+  getChat,
+  checkIfChatExists,
+} from './controllers/chatController.js';
 import { logIn } from './controllers/commonController.js';
 import about from './text_content/about.js';
 import privacy from './text_content/privacy.js';
@@ -60,7 +66,7 @@ app.post('/save/company_profile/:companyid', upload.none(), saveCompanyProfile);
 app.get('/company_reg_data/:companyid', getCompanyRegData);
 app.get('/company_profile/:companyid', getCompanyProfile);
 app.get('/remove/company_profile/:companyid', removeCompanyProfile);
-app.get('/company_job_list/:companyid', getCompanyJobList);
+app.get('/company_job_list/:companyid/:seekerid', getCompanyJobList);
 
 // Seeker request handlers
 app.post('/sign_up/seeker', upload.none(), signUpSeeker);
@@ -85,6 +91,7 @@ app.post('/create_chat', upload.single('cvFile'), cloudinaryUpload, createChat);
 app.post('/add_chat_message', upload.none(), addChatMessage);
 app.get('/chat_list/:usertype/:userid', getUserChats);
 app.get('/chat/:usertype/:companyid/:seekerid/:jobid', getChat);
+app.get('/check_if_chat_exists/:companyid/:seekerid/:jobid', checkIfChatExists);
 
 // Common handlers
 app.post('/login', upload.none(), logIn);
