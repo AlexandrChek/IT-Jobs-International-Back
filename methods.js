@@ -147,18 +147,12 @@ export const countTotalWorkExperience = experienceArr => {
 };
 
 // Fn to find the object of chats between two relevant users:
-export const getRelevantUsersChatsObj = (chats, companyId, seekerId) => {
-  const relevantChatsObj = chats.chats.find(
-    chat => chat.company.id === companyId && chat.seeker.id === seekerId,
-  );
-  return relevantChatsObj;
-};
+export const getRelevantUsersChatsObj = (chats, companyId, seekerId) =>
+  chats.chats.find(chat => chat.company.id === companyId && chat.seeker.id === seekerId);
 
 //Fn to check if there is a chat between two users about the particular job:
-export const findIfChatExists = (chats, companyId, seekerId, jobId) => {
-  const relevantChatsObj = getRelevantUsersChatsObj(chats, companyId, seekerId);
-  return relevantChatsObj?.twoUsersChats.some(chat => chat.job.jobId === jobId) || false;
-};
+export const findIfChatExists = (relevantChatsObj, jobId) =>
+  relevantChatsObj?.twoUsersChats.some(chat => chat.job.jobId === jobId) || false;
 
 // Fn to check if total work experience of seeker matches the search criteria:
 export const checkWorkExperience = (worksArr, requiredYears = '', requiredMonths = '') => {

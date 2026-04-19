@@ -101,7 +101,8 @@ export const getChat = async (req, res) => {
 export const checkIfChatExists = async (req, res) => {
   const { companyid, seekerid, jobid } = req.params;
   const chats = await readJSON('chats.json');
-  const doesChatAlreadyExists = findIfChatExists(chats, companyid, seekerid, jobid);
+  const relevantChatsObj = getRelevantUsersChatsObj(chats, companyid, seekerid);
+  const doesChatAlreadyExists = findIfChatExists(relevantChatsObj, jobid);
 
   res.status(200).json({ doesChatAlreadyExists });
 };

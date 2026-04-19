@@ -6,6 +6,7 @@ import {
   getProfileById,
   getProfileIndexById,
   removeProfileById,
+  getRelevantUsersChatsObj,
   findIfChatExists,
 } from '../methods.js';
 import { emailDoesAlreadyExistResponse } from '../constants.js';
@@ -96,12 +97,15 @@ export const getCompanyJobList = async (req, res) => {
   if (!currentJobs.length) return res.sendStatus(204);
 
   const chats = await readJSON('chats.json');
+  const relevantUsersChatsObj = getRelevantUsersChatsObj(chats, companyid, seekerid);
+
   const jobs = currentJobs.map(job => {
-    return {
-      id: job.jobId,
-      value: job.position,
-      hasChat: findIfChatExists(chats, companyid, seekerid, job.jobId),
-    };
+    const jobOption = { id: job.jobId, value: job.position };
+    const hasChat = findIfChatExists(relevantUsersChatsObj, job.jobId);
+
+    return hasChat
+      ? { ...jobOption, disabled: true, causeOfDisabling: 'Chat already exists' }
+      : jobOption;
   });
 
   res.status(200).json(jobs);
