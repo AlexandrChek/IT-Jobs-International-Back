@@ -8,6 +8,7 @@ import {
   countTotalWorkExperience,
   removeProfileById,
   makeWorkplacesAnArray,
+  removeAllUserChats,
   compareMeaning,
   checkPosition,
   checkWorkplaces,
@@ -15,6 +16,7 @@ import {
   checkSkills,
   checkEnglish,
 } from '../methods.js';
+import { deleteCvsByPrefix } from '../cloudinaryConfig.js';
 import { emailDoesAlreadyExistResponse } from '../constants.js';
 
 export const signUpSeeker = async (req, res) => {
@@ -161,6 +163,18 @@ export const removeSeekerProfile = async (req, res) => {
   const clearedProfiles = removeProfileById(profiles, 'seeker', seekerid);
 
   await writeJSON('seekerProfiles.json', clearedProfiles);
+
+  const chats = await readJSON('chats.json');
+
+  if (!chats.chats.length) {
+    return res.sendStatus(200);
+  }
+
+  const filteredChats = removeAllUserChats(chats, 'seeker', seekerid);
+
+  await writeJSON('chats.json', filteredChats);
+
+  await deleteCvsByPrefix(seekerid);
 
   res.sendStatus(200);
 };

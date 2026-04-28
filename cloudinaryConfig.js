@@ -12,9 +12,10 @@ export const cloudinaryUpload = (req, res, next) => {
   if (!req.file) return next();
 
   let originalNameArr = req.file.originalname.split('.');
+  const { seekerId, jobId } = req.body;
   const extension = originalNameArr.pop().toLowerCase();
   const fileName = originalNameArr.join('_').replace(/[^a-zA-Z0-9\-_]/g, '_');
-  const publicId = `${Date.now()}_${fileName}.${extension}`;
+  const publicId = `${seekerId}_${jobId}_${fileName}.${extension}`;
 
   cloudinary.uploader
     .upload_stream(
@@ -26,6 +27,14 @@ export const cloudinaryUpload = (req, res, next) => {
       },
     )
     .end(req.file.buffer);
+};
+
+export const deleteCvsByPrefix = async publicIdStart => {
+  const prefix = `it-jobs-int-back/CVs/${publicIdStart}_`;
+
+  const result = await cloudinary.api.delete_resources_by_prefix(prefix, { resource_type: 'raw' });
+
+  console.log(result);
 };
 
 export default cloudinary;

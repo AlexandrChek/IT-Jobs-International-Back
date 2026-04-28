@@ -91,6 +91,24 @@ export const makeWorkplacesAnArray = body => {
   return normBody;
 };
 
+// Fn to get an array of all chats of the specific user:
+export const getAllChatsOfUser = (chats, userType, userId) =>
+  chats.chats.filter(chat => chat[userType].id === userId);
+
+// Fn to find the object of chats between two relevant users:
+export const getRelevantUsersChatsObj = (chats, companyId, seekerId) =>
+  chats.chats.find(chat => chat.company.id === companyId && chat.seeker.id === seekerId);
+
+// Fn to check if there is a chat between two users about the particular job:
+export const findIfChatExists = (relevantChatsObj, jobId) =>
+  relevantChatsObj?.twoUsersChats.some(chat => chat.job.jobId === jobId) || false;
+
+// Fn to remove all chats of the specific user from the object, which contains the array with all chats:
+export const removeAllUserChats = (chats, userType, userId) => {
+  const filteredChats = chats.chats.filter(chat => chat[userType].id !== userId);
+  return { chats: filteredChats };
+};
+
 // Fn to bring text into a comparable form:
 export const normalizeText = text => text.trim().toLowerCase().replaceAll('  ', ' ');
 
@@ -145,14 +163,6 @@ export const countTotalWorkExperience = experienceArr => {
 
   return { totalYears, totalMonths };
 };
-
-// Fn to find the object of chats between two relevant users:
-export const getRelevantUsersChatsObj = (chats, companyId, seekerId) =>
-  chats.chats.find(chat => chat.company.id === companyId && chat.seeker.id === seekerId);
-
-//Fn to check if there is a chat between two users about the particular job:
-export const findIfChatExists = (relevantChatsObj, jobId) =>
-  relevantChatsObj?.twoUsersChats.some(chat => chat.job.jobId === jobId) || false;
 
 // Fn to check if total work experience of seeker matches the search criteria:
 export const checkWorkExperience = (worksArr, requiredYears = '', requiredMonths = '') => {

@@ -6,9 +6,12 @@ import {
   getProfileById,
   getProfileIndexById,
   removeProfileById,
+  getAllChatsOfUser,
   getRelevantUsersChatsObj,
   findIfChatExists,
+  removeAllUserChats,
 } from '../methods.js';
+import { deleteCvsByPrefix } from '../cloudinaryConfig.js';
 import { emailDoesAlreadyExistResponse } from '../constants.js';
 
 export const signUpCompany = async (req, res) => {
@@ -84,6 +87,23 @@ export const removeCompanyProfile = async (req, res) => {
   const clearedProfiles = removeProfileById(profiles, 'company', companyid);
 
   await writeJSON('companyProfiles.json', clearedProfiles);
+
+  const chats = await readJSON('chats.json');
+
+  if (!chats.chats.length) {
+    return res.sendStatus(200);
+  }
+
+  const filteredChats = removeAllUserChats(chats, 'company', companyid);
+  await writeJSON('chats.json', filteredChats);
+
+  const companyChats = getAllChatsOfUser(chats, 'company', companyid);
+
+  for (const chatObj of companyChats) {
+    for (const chat of chatObj.twoUsersChats) {
+      await deleteCvsByPrefix(`${chatObj.seeker.id}_${chat.job.jobId}`);
+    }
+  }
 
   res.sendStatus(200);
 };

@@ -10,6 +10,7 @@ import {
   checkWorkplaces,
   checkSkills,
 } from '../methods.js';
+import { deleteCvsByPrefix } from '../cloudinaryConfig.js';
 
 export const createJob = async (req, res) => {
   const { companyid } = req.params;
@@ -91,17 +92,29 @@ export const removeJob = async (req, res) => {
     return res.sendStatus(200);
   }
 
-  const newChats = chats.chats.map(chat => {
-    if (chat.company.id !== companyid) return chat;
+  let filteredChats = [];
 
-    const filteredTwoUsersChats = chat.twoUsersChats.filter(item => item.job.jobId !== jobid);
-    if (filteredTwoUsersChats.length === 0) return null;
+  for (const chatObj of chats.chats) {
+    if (chatObj.company.id !== companyid) {
+      filteredChats.push(chatObj);
+    } else {
+      let filteredTwoUsersChats = [];
 
-    return { ...chat, twoUsersChats: filteredTwoUsersChats };
-  });
+      for (const chat of chatObj.twoUsersChats) {
+        if (chat.job.jobId !== jobid) {
+          filteredTwoUsersChats.push(chat);
+        } else {
+          await deleteCvsByPrefix(`${chatObj.seeker.id}_${chat.job.jobId}`);
+        }
+      }
 
-  const clearedChats = newChats.filter(Boolean);
-  chats.chats = clearedChats;
+      if (filteredTwoUsersChats.length) {
+        filteredChats.push({ ...chatObj, twoUsersChats: filteredTwoUsersChats });
+      }
+    }
+  }
+
+  chats.chats = filteredChats;
 
   await writeJSON('chats.json', chats);
 

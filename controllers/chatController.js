@@ -2,6 +2,7 @@ import {
   readJSON,
   writeJSON,
   getProfileById,
+  getAllChatsOfUser,
   getRelevantUsersChatsObj,
   findIfChatExists,
 } from '../methods.js';
@@ -68,7 +69,7 @@ export const getUserChats = async (req, res) => {
   const { usertype, userid } = req.params;
   const chatParticipantType = usertype === 'company' ? 'seeker' : 'company';
   const chats = await readJSON('chats.json');
-  const matchedChats = chats.chats.filter(chat => chat[usertype].id === userid);
+  const matchedChats = getAllChatsOfUser(chats, usertype, userid);
   let chatList = [];
 
   if (matchedChats.length) {
