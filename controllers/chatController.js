@@ -83,6 +83,8 @@ export const getUserChats = async (req, res) => {
         };
       }),
     );
+
+    chatList.sort((a, b) => b.lastMessage.date - a.lastMessage.date);
   }
 
   res.status(200).json(chatList);
