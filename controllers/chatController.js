@@ -5,6 +5,7 @@ import {
   getAllChatsOfUser,
   getRelevantUsersChatsObj,
   findIfChatExists,
+  countUnreadMessages,
 } from '../methods.js';
 
 export const createChat = async (req, res) => {
@@ -74,18 +75,7 @@ export const addChatMessage = async (req, res) => {
 //-----------------------------------------------------------------------------------------
 export const getUserUnreadMsgCount = async (req, res) => {
   const { usertype, userid } = req.params;
-  const chats = await readJSON('chats.json');
-  const matchedChats = getAllChatsOfUser(chats, usertype, userid);
-  let unreadCount = 0;
-
-  if (matchedChats.length) {
-    const userName = matchedChats[0][usertype].name;
-
-    unreadCount = matchedChats
-      .flatMap(chat => chat.twoUsersChats)
-      .flatMap(twoUsersChat => twoUsersChat.messages)
-      .filter(msg => !msg.isRead && msg.name !== userName).length;
-  }
+  const unreadCount = await countUnreadMessages(usertype, userid);
 
   res.status(200).json({ unreadCount });
 };

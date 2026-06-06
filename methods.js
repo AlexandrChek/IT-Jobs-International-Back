@@ -109,6 +109,24 @@ export const removeAllUserChats = (chats, userType, userId) => {
   return { chats: filteredChats };
 };
 
+// Fn to count the number of unread messages the user has:
+export const countUnreadMessages = async (userType, userId) => {
+  const chats = await readJSON('chats.json');
+  const matchedChats = getAllChatsOfUser(chats, userType, userId);
+  let unreadCount = 0;
+
+  if (matchedChats.length) {
+    const userName = matchedChats[0][userType].name;
+
+    unreadCount = matchedChats
+      .flatMap(chat => chat.twoUsersChats)
+      .flatMap(twoUsersChat => twoUsersChat.messages)
+      .filter(msg => !msg.isRead && msg.name !== userName).length;
+  }
+
+  return unreadCount;
+};
+
 // Fn to bring text into a comparable form:
 export const normalizeText = text => text.trim().toLowerCase().replaceAll('  ', ' ');
 
