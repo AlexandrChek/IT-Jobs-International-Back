@@ -35,6 +35,8 @@ import {
   getUserChats,
   getChat,
   checkIfChatExists,
+  getUserUnreadMsgCount,
+  markMessagesAsRead,
 } from './controllers/chatController.js';
 import { logIn } from './controllers/commonController.js';
 import about from './text_content/about.js';
@@ -92,6 +94,8 @@ app.post('/add_chat_message', upload.none(), addChatMessage);
 app.get('/chat_list/:usertype/:userid', getUserChats);
 app.get('/chat/:usertype/:companyid/:seekerid/:jobid', getChat);
 app.get('/check_if_chat_exists/:companyid/:seekerid/:jobid', checkIfChatExists);
+app.get('/user_unread_msg_count/:usertype/:userid', getUserUnreadMsgCount);
+app.get('mark_messages_as_read/:usertype/:seekerid/:companyid/:jobid', markMessagesAsRead);
 
 // Common handlers
 app.post('/login', upload.none(), logIn);

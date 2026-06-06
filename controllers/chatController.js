@@ -17,7 +17,13 @@ export const createChat = async (req, res) => {
   let chat = {
     job: { jobId, position },
     messages: [
-      { date, name: userName, text: message, cvFileLink: req.file?.cloudinaryUrl || null },
+      {
+        date,
+        name: userName,
+        text: message,
+        cvFileLink: req.file?.cloudinaryUrl || null,
+        isRead: false,
+      },
     ],
   };
 
@@ -57,8 +63,49 @@ export const addChatMessage = async (req, res) => {
   const chatAboutPositionIndex = chats.chats[chatIndex].twoUsersChats.findIndex(
     chat => chat.job.jobId === jobId,
   );
+  const newMessage = { ...message, isRead: false };
 
-  chats.chats[chatIndex].twoUsersChats[chatAboutPositionIndex].messages.push(message);
+  chats.chats[chatIndex].twoUsersChats[chatAboutPositionIndex].messages.push(newMessage);
+
+  await writeJSON('chats.json', chats);
+
+  res.sendStatus(200);
+};
+//-----------------------------------------------------------------------------------------
+export const getUserUnreadMsgCount = async (req, res) => {
+  const { usertype, userid } = req.params;
+  const chats = await readJSON('chats.json');
+  const matchedChats = getAllChatsOfUser(chats, usertype, userid);
+  let unreadCount = 0;
+
+  if (matchedChats.length) {
+    const userName = matchedChats[0][usertype].name;
+
+    unreadCount = matchedChats
+      .flatMap(chat => chat.twoUsersChats)
+      .flatMap(twoUsersChat => twoUsersChat.messages)
+      .filter(msg => !msg.isRead && msg.name !== userName).length;
+  }
+
+  res.status(200).json({ unreadCount });
+};
+//-----------------------------------------------------------------------------------------
+export const markMessagesAsRead = async (req, res) => {
+  const { usertype, seekerid, companyid, jobid } = req.params;
+  const chats = await readJSON('chats.json');
+  const chatObjIndex = chats.chats.findIndex(
+    chatObj => chatObj.company.id === companyid && chatObj.seeker.id === seekerid,
+  );
+  const chatIndex = chats.chats[chatObjIndex].twoUsersChats.findIndex(
+    chat => chat.job.jobId === jobid,
+  );
+  const userName = chats.chats[chatObjIndex][usertype].name;
+
+  chats.chats[chatObjIndex].twoUsersChats[chatIndex].messages.forEach(msg => {
+    if (msg.name === userName && !msg.isRead) {
+      msg.isRead = true;
+    }
+  });
 
   await writeJSON('chats.json', chats);
 
@@ -75,11 +122,14 @@ export const getUserChats = async (req, res) => {
   if (matchedChats.length) {
     chatList = matchedChats.flatMap(chat =>
       chat.twoUsersChats.map(twoUsersChat => {
+        const unreadCount = twoUsersChat.messages.filter(msg => !msg.isRead).length;
+
         return {
           chatParticipantId: chat[chatParticipantType].id,
           chatParticipantName: chat[chatParticipantType].name,
           job: twoUsersChat.job,
           lastMessage: twoUsersChat.messages.at(-1),
+          unreadCount,
         };
       }),
     );
@@ -97,8 +147,14 @@ export const getChat = async (req, res) => {
   const relevantChatsObj = getRelevantUsersChatsObj(chats, companyid, seekerid);
   const chatParticipantName = relevantChatsObj[chatParticipantType].name;
   const chat = relevantChatsObj.twoUsersChats.find(chat => chat.job.jobId === jobid);
+  const unreadCount = chat.messages.filter(msg => !msg.isRead).length;
 
-  res.status(200).json({ ...chat, chatParticipantName });
+  res.status(200).json({
+    ...chat,
+    chatParticipantName,
+    msgCount: chat.messages.length,
+    unreadCount,
+  });
 };
 //-----------------------------------------------------------------------------------------
 export const checkIfChatExists = async (req, res) => {
