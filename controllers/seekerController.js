@@ -6,7 +6,6 @@ import {
   getProfileById,
   getProfileIndexById,
   countTotalWorkExperience,
-  countUnreadMessages,
   removeProfileById,
   makeWorkplacesAnArray,
   removeAllUserChats,
@@ -120,7 +119,6 @@ export const getSeekerRegData = async (req, res) => {
 export const getSeekerProfile = async (req, res) => {
   const { seekerid } = req.params;
   const profiles = await readJSON('seekerProfiles.json');
-  const unreadCount = await countUnreadMessages('seeker', seekerid);
   const profile = getProfileById(profiles, 'seeker', seekerid);
   const userName = `${profile.regData.firstName} ${profile.regData.lastName}`;
   const location = `${profile.regData.country}, ${profile.regData.city}`;
@@ -132,7 +130,7 @@ export const getSeekerProfile = async (req, res) => {
   }
 
   if (profile.publicInfo) {
-    response = { ...response, ...profile.publicInfo, unreadCount };
+    response = { ...response, ...profile.publicInfo };
 
     if (response.work) {
       const totalExperience = countTotalWorkExperience(response.work);

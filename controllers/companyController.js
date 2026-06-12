@@ -6,7 +6,6 @@ import {
   getProfileById,
   getProfileIndexById,
   removeProfileById,
-  countUnreadMessages,
   getAllChatsOfUser,
   getRelevantUsersChatsObj,
   findIfChatExists,
@@ -70,14 +69,13 @@ export const getCompanyRegData = async (req, res) => {
 export const getCompanyProfile = async (req, res) => {
   const { companyid } = req.params;
   const profiles = await readJSON('companyProfiles.json');
-  const unreadCount = await countUnreadMessages('company', companyid);
   const profile = getProfileById(profiles, 'company', companyid);
   const companyName = profile.regData.companyName;
   const location = `${profile.regData.country}, ${profile.regData.city}`;
   let response = { companyName, location };
 
   if (profile.publicInfo) {
-    response = { ...response, ...profile.publicInfo, unreadCount };
+    response = { ...response, ...profile.publicInfo };
   }
 
   res.status(200).json(response);

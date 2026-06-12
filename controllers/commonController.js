@@ -1,4 +1,4 @@
-import { readJSON } from '../methods.js';
+import { readJSON, countUnreadMessages } from '../methods.js';
 
 export const logIn = async (req, res) => {
   const { userType, email, password } = req.body;
@@ -7,6 +7,7 @@ export const logIn = async (req, res) => {
   const profile = profiles.profiles.find(
     profile => profile.regData.email === email && profile.regData.password === password,
   );
+  let response;
 
   if (profile) {
     const userId = profile[`${userType}Id`];
@@ -14,9 +15,12 @@ export const logIn = async (req, res) => {
       userType === 'company'
         ? profile.regData.companyName
         : `${profile.regData.firstName} ${profile.regData.lastName}`;
+    const unreadCount = await countUnreadMessages(userType, userId);
 
-    res.json({ userType, userId, userName });
+    response = { userType, userId, userName, unreadCount };
   } else {
-    res.json({ authFailureMessage: 'Wrong e-mail or password' });
+    response = { authFailureMessage: 'Wrong e-mail or password' };
   }
+
+  res.status(200).json(response);
 };
