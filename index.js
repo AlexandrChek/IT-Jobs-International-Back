@@ -95,7 +95,11 @@ app.get('/chat_list/:usertype/:userid', getUserChats);
 app.get('/chat/:usertype/:companyid/:seekerid/:jobid', getChat);
 app.get('/check_if_chat_exists/:companyid/:seekerid/:jobid', checkIfChatExists);
 app.get('/user_unread_msg_count/:usertype/:userid', getUserUnreadMsgCount);
-app.get('mark_messages_as_read/:usertype/:seekerid/:companyid/:jobid', markMessagesAsRead);
+app.get(
+  '/mark_messages_as_read/:usertype/:seekerid/:companyid/:jobid',
+  markMessagesAsRead,
+  getUserUnreadMsgCount,
+);
 
 // Common handlers
 app.post('/login', upload.none(), logIn);

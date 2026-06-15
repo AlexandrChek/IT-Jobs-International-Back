@@ -15,7 +15,8 @@ export const logIn = async (req, res) => {
       userType === 'company'
         ? profile.regData.companyName
         : `${profile.regData.firstName} ${profile.regData.lastName}`;
-    const unreadCount = await countUnreadMessages(userType, userId);
+    const chats = await readJSON('chats.json');
+    const unreadCount = countUnreadMessages(chats, userType, userId);
 
     response = { userType, userId, userName, unreadCount };
   } else {

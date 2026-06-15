@@ -110,8 +110,7 @@ export const removeAllUserChats = (chats, userType, userId) => {
 };
 
 // Fn to count the number of unread messages the user has:
-export const countUnreadMessages = async (userType, userId) => {
-  const chats = await readJSON('chats.json');
+export const countUnreadMessages = (chats, userType, userId) => {
   const matchedChats = getAllChatsOfUser(chats, userType, userId);
   let unreadCount = 0;
 

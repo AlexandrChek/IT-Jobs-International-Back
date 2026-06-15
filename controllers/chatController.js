@@ -74,13 +74,20 @@ export const addChatMessage = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------
 export const getUserUnreadMsgCount = async (req, res) => {
-  const { usertype, userid } = req.params;
-  const unreadCount = await countUnreadMessages(usertype, userid);
+  const { usertype } = req.params;
+  const userId = req.params.userid ?? req.userid;
+  let chats = req.chats;
+
+  if (!chats) {
+    chats = await readJSON('chats.json');
+  }
+
+  const unreadCount = countUnreadMessages(chats, usertype, userId);
 
   res.status(200).json({ unreadCount });
 };
 //-----------------------------------------------------------------------------------------
-export const markMessagesAsRead = async (req, res) => {
+export const markMessagesAsRead = async (req, res, next) => {
   const { usertype, seekerid, companyid, jobid } = req.params;
   const chats = await readJSON('chats.json');
   const chatObjIndex = chats.chats.findIndex(
@@ -92,14 +99,17 @@ export const markMessagesAsRead = async (req, res) => {
   const userName = chats.chats[chatObjIndex][usertype].name;
 
   chats.chats[chatObjIndex].twoUsersChats[chatIndex].messages.forEach(msg => {
-    if (msg.name === userName && !msg.isRead) {
+    if (msg.name !== userName && !msg.isRead) {
       msg.isRead = true;
     }
   });
 
   await writeJSON('chats.json', chats);
 
-  res.sendStatus(200);
+  const userid = chats.chats[chatObjIndex][usertype].id;
+  req.userid = userid;
+  req.chats = chats;
+  next();
 };
 //-----------------------------------------------------------------------------------------
 export const getUserChats = async (req, res) => {
