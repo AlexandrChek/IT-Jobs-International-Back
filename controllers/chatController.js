@@ -19,7 +19,7 @@ export const createChat = async (req, res) => {
     job: { jobId, position },
     messages: [
       {
-        date,
+        date: Number(date),
         name: userName,
         text: message,
         cvFileLink: req.file?.cloudinaryUrl || null,
