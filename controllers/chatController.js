@@ -122,7 +122,10 @@ export const getUserChats = async (req, res) => {
   if (matchedChats.length) {
     chatList = matchedChats.flatMap(chat =>
       chat.twoUsersChats.map(twoUsersChat => {
-        const unreadCount = twoUsersChat.messages.filter(msg => !msg.isRead).length;
+        const userName = chat[usertype].name;
+        const unreadCount = twoUsersChat.messages.filter(
+          msg => msg.name !== userName && !msg.isRead,
+        ).length;
 
         return {
           chatParticipantId: chat[chatParticipantType].id,
